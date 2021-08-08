@@ -1,0 +1,64 @@
+<section class="bg-gray-900  min-h-screen">
+    <div class="bg-gray-600 px-4 py-3 flex items-center justify-between">
+        <div class="flex">
+            <a routerLink="/" class="flex hover:text-gray-400">
+                <div class="px-3 py-2 bg-gray-500">Home</div>
+                <div style="width: 0px;height: 0px;border-top: 20px solid transparent;border-bottom: 20px solid transparent;border-left: 20px solid rgba(107,114,128,var(--tw-bg-opacity));"></div>
+            </a>
+
+            <a routerLink="{{ getCompetitionUrl() }}" class="flex hover:text-gray-400 ml-2">
+                <div class="px-3 py-2 bg-gray-500">{{ competition.name }}</div>
+                <div style="width: 0px;height: 0px;border-top: 20px solid transparent;border-bottom: 20px solid transparent;border-left: 20px solid rgba(107,114,128,var(--tw-bg-opacity));"></div>
+            </a>
+        </div>
+
+        <a routerLink="/match-full">Static match detail</a>
+    </div>
+    <div class="mx-4 mt-4 text-sm bg-gray-800">
+        <div class="flex justify-between items-center bg-gray-600 px-4 py-3 rounded-t-lg">
+            <h4 class="text-lg">Matches</h4>
+            <div>
+                <select [(ngModel)]="matchStatus" class="text-black px-4 py-2 rounded-md" (change)="getCompetitionDetails()">
+                    <option value="">Choose a status</option>
+                    <option value="SCHEDULED">Scheduled</option>
+                    <option value="LIVE">Live</option>
+                    <option value="IN_PLAY">In play</option>
+                    <option value="PAUSED">Paused</option>
+                    <option value="FINISHED">Finished</option>
+                    <option value="POSTPONED">Postponed</option>
+                    <option value="SUSPENDED">Suspended</option>
+                    <option value="CANCELED">Canceled</option>
+                </select>
+            </div>
+        </div>
+        <div *ngIf="matches.length == 0" class="text-center text-lg">
+            There are no matches
+        </div>
+        <div class="grid grid-cols-2 py-2 m-auto" style="width:800px;" *ngIf="matches.length > 0">
+            <a
+                *ngFor="let match of matches; let i=index"
+                href="/matches/{{ match.id }}"
+                class="flex justify-between p-6 items-center hover:bg-gray-900 border-b border-gray-500"
+                [class.border-r]="i%2==0"
+            >
+                <div class="flex flex-col w-full py-4 pr-2 border-gray-500 border-r-1 border-r">
+                    <div class="flex mb-2" [class]="getTeamTextColor(match, 'HOME_TEAM')">
+                        <div class="mr-2"><i class="fab fa-angular "></i></div>
+                        <div class="flex-1">{{ match.homeTeam.name }}</div>
+                        <div>{{ match.score.fullTime.homeTeam }}</div>
+                    </div>
+                    <div class="flex" [class]="getTeamTextColor(match, 'AWAY_TEAM')">
+                        <div class="mr-2"><i class="fab fa-angular"></i></div>
+                        <div class="flex-1">{{ match.awayTeam.name }}</div>
+                        <div>{{ match.score.fullTime.awayTeam }}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col py-4 pl-2 pr-4 items-center">
+                    <div>{{ match.status }}</div>
+                    <div>{{ getDate(match) }}</div>
+                    <div [class.text-gray-400]="isMatchFinished(match)">{{ getTime(match) }}</div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
