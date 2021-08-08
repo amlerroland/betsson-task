@@ -1,0 +1,14 @@
+<div>
+    <div class="flex justify-between cursor-pointer hover:text-gray-400" (click)="isOpen = !isOpen">
+        <h5 class="text-base">{{ area.name }}</h5>
+        <div>
+            <button *ngIf="!isOpen"><i class="fas fa-chevron-down"></i></button>
+            <button *ngIf="isOpen"><i class="fas fa-chevron-up"></i></button>
+        </div>
+    </div>
+    <ul class="px-2" *ngIf="isOpen">
+        <li *ngFor="let competition of competitions">
+            <a routerLink="{{ getUrl(competition) }}" class="hover:text-gray-400">{{ competition.name }}</a>
+        </li>
+    </ul>
+</div>
