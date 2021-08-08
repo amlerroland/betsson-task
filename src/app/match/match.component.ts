@@ -31,7 +31,7 @@ export class MatchComponent implements OnInit {
         });
 
         // The token should go to an env file of some sort but
-        this.http.get<MatchDetailResponse>(`http://api.football-data.org/v2/matches/${this.matchId}`, {
+        this.http.get<MatchDetailResponse>(`https://api.football-data.org/v2/matches/${this.matchId}`, {
             headers: {
                 'X-Auth-Token': 'e8db5165dd4b468c81a4ac50e06b56f8'
             }

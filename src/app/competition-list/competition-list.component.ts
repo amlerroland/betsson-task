@@ -24,7 +24,7 @@ export class CompetitionListComponent implements OnInit {
     constructor(private http: HttpClient) { }
 
     ngOnInit(): void {
-        this.http.get<CompetitionListResponse>('http://api.football-data.org/v2/competitions', {
+        this.http.get<CompetitionListResponse>('https://api.football-data.org/v2/competitions', {
             params: {
                 plan: 'TIER_ONE'
             },

@@ -39,7 +39,7 @@ export class CompetitionDetailComponent implements OnInit {
 
     getCompetitionDetails(): void {
         // The token should go to an env file of some sort but
-        this.http.get<CompetitionDetailResponse>(`http://api.football-data.org/v2/competitions/${this.competitionId}/matches`, {
+        this.http.get<CompetitionDetailResponse>(`https://api.football-data.org/v2/competitions/${this.competitionId}/matches`, {
             params: {
                 status: this.matchStatus
             },
