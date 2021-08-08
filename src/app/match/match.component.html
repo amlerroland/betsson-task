@@ -1,0 +1,183 @@
+<!-- Not familiar with the best practice to handle the not yet available data so it is handled by an if -->
+<section class="bg-gray-900 min-h-screen" *ngIf="validMatch()">
+    <div class="bg-gray-600 px-4 py-3 flex items-center justify-between">
+        <div class="flex">
+            <a routerLink="/" class="flex hover:text-gray-400">
+                <div class="px-3 py-2 bg-gray-500">Home</div>
+                <div style="width: 0px;height: 0px;border-top: 20px solid transparent;border-bottom: 20px solid transparent;border-left: 20px solid rgba(107,114,128,var(--tw-bg-opacity));"></div>
+            </a>
+
+            <a href="/competitions/{{ getMatch().competition.id }}" class="flex hover:text-gray-400 ml-2">
+                <div class="px-3 py-2 bg-gray-500">{{ getMatch().competition.name }}</div>
+                <div style="width: 0px;height: 0px;border-top: 20px solid transparent;border-bottom: 20px solid transparent;border-left: 20px solid rgba(107,114,128,var(--tw-bg-opacity));"></div>
+            </a>
+
+            <a href="#" class="flex hover:text-gray-400 ml-2">
+                <div class="px-3 py-2 bg-gray-500">{{ getMatch().homeTeam.name }} vs. {{ getMatch().awayTeam.name }}</div>
+                <div style="width: 0px;height: 0px;border-top: 20px solid transparent;border-bottom: 20px solid transparent;border-left: 20px solid rgba(107,114,128,var(--tw-bg-opacity));"></div>
+            </a>
+        </div>
+
+        <a routerLink="/match-full">Static match detail</a>
+    </div>
+    <div class="m-auto w-1/2 bg-gray-800">
+        <div class="p-4 border-b border-r border-l border-gray-500">
+            <div class="flex justify-between mb-2">
+                <div>{{ getMatch().competition.name }} - {{ getDate() }}</div>
+                <div>{{ getMatch().status }}</div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center flex-1">
+                    <div class="flex-1 flex justify-center flex-col items-center">
+                        <div><i class="fab fa-angular fa-4x"></i></div>
+                        <div>{{ getMatch().homeTeam.name }}</div>
+                    </div>
+                    <div class="text-6xl">{{ getMatch().score.fullTime.homeTeam }}</div>
+                </div>
+                <div class="mx-8">-</div>
+                <div class="flex justify-between items-center flex-1">
+                    <div class="text-6xl">{{ getMatch().score.fullTime.awayTeam }}</div>
+                    <div class="flex-1 flex justify-center flex-col items-center">
+                        <div><i class="fab fa-angular fa-4x"></i></div>
+                        <div>{{ getMatch().awayTeam.name }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-around text-sm" *ngIf="hasGoals()">
+                <div class="text-gray-500 flex-1">
+                    <div *ngFor="let goal of getGoals(getMatch().homeTeam.id)">{{ goal }}</div>
+                </div>
+                <div><i class="fas fa-futbol fa-lg"></i></div>
+                <div class="text-gray-500 flex-1 flex flex-col">
+                    <div *ngFor="let goal of getGoals(getMatch().awayTeam.id)" class="self-end">{{ goal }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-around bg-gray-600">
+            <button class="px-4 py-2 hover:text-gray-500" (click)="activeTab = 'timeline'" *ngIf="hasEvents()" [class.border-b-2]="activeTab == 'timeline'">Timeline</button>
+            <button class="px-4 py-2 hover:text-gray-500" (click)="activeTab = 'lineup'" *ngIf="hasLineup()" [class.border-b-2]="activeTab == 'lineup'">Lineup</button>
+        </div>
+        <div>
+            <!-- Timeline tab -->
+            <div *ngIf="activeTab == 'timeline' && hasEvents()" class="mt-4">
+                <div *ngFor="let event of getEvents()">
+                    <div [ngSwitch]="event.type">
+
+                        <!-- Goal event -->
+                        <div *ngSwitchCase="'goal'" class="rounded-lg mx-10 mb-4 border border-gray-500">
+                            <div class="bg-red-600 rounded-t-lg" [class.bg-red-600]="!event.isHomeTeam" [class.bg-green-600]="event.isHomeTeam">
+                                <div class="flex flex-col items-center py-6">
+                                    <div><i class="fas fa-futbol fa-md"></i></div>
+                                    <div>GOAAAAAAAAAAAAL!</div>
+                                    <div>{{ event.minute }}'</div>
+                                </div>
+                                <div class="text-center p-2 text-sm" [class.bg-red-700]="!event.isHomeTeam" [class.bg-green-700]="event.isHomeTeam">
+                                    <span class="mr-3" [class.text-gray-300]="event.team != getMatch().homeTeam.name">{{ getMatch().homeTeam.name }}</span>
+                                    <span [class.text-gray-300]="event.team != getMatch().homeTeam.name">{{ event.home }}</span>
+                                    <span class="mx-4 text-gray-300">-</span>
+                                    <span [class.text-gray-300]="event.team != getMatch().awayTeam.name">{{ event.away }}</span>
+                                    <span class="ml-3" [class.text-gray-300]="event.team != getMatch().awayTeam.name">{{ getMatch().awayTeam.name }}</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div>{{ event.player }}</div>
+                                <div class="text-sm text-gray-500">{{ event.team }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Booking event -->
+                        <div *ngSwitchCase="'booking'" class="rounded-lg mx-10 mb-4 border border-gray-500">
+                            <div class="flex justify-between items-center px-4 py-2 border-b border-gray-700">
+                                <div class="flex">
+                                    <div class="bg-yellow-300 h-5 w-4 rounded-md mr-2"></div>
+                                    <div>{{ event.card }}</div>
+                                </div>
+                                <div class="text-sm text-gray-500 text-sm">{{ event.minute }}'</div>
+                            </div>
+                            <div class="flex justify-between items-center p-4">
+                                <div>
+                                    <div>{{ event.player }}</div>
+                                    <div class="text-sm text-gray-500">{{ event.team }}</div>
+                                </div>
+                                <img class="rounded-full border-2" src="https://i.pravatar.cc/60" alt="">
+                            </div>
+                        </div>
+
+                        <!-- Substitution event -->
+                        <div *ngSwitchCase="'substitution'" class="rounded-lg mx-10 mb-4 border border-gray-500">
+                            <div class="flex justify-between items-center px-4 py-2 border-b border-gray-700">
+                                <div class="flex">
+                                    <i class="fas fa-exchange-alt fa-rotate-90 mr-2"></i>
+                                    <div>Substitution</div>
+                                </div>
+                                <div class="text-sm text-gray-500 text-sm">{{ event.minute }}'</div>
+                            </div>
+                            <div class="flex justify-between items-center p-4">
+                                <div>
+                                    <div class="text-green-500">IN</div>
+                                    <div>{{ event.in }}</div>
+                                    <div class="text-sm text-gray-500">{{ event.team }}</div>
+                                </div>
+                                <img class="rounded-full border-2" src="https://i.pravatar.cc/60" alt="">
+                            </div>
+                            <div class="flex justify-between items-center p-4">
+                                <div>
+                                    <div class="text-red-500">OUT</div>
+                                    <div>{{ event.out }}</div>
+                                    <div class="text-sm text-gray-500">{{ event.team }}</div>
+                                </div>
+                                <img class="rounded-full border-2" src="https://i.pravatar.cc/60" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lineup tab -->
+            <div *ngIf="activeTab == 'lineup' && hasLineup()">
+                <h5 class="text-center text-lg my-4">Starting lineup</h5>
+                <div class="flex justify-between">
+                    <div class="w-1/2">
+                        <div *ngFor="let player of getMatch().homeTeam.lineup" class="flex items-center p-4">
+                            <img class="rounded-full border-2 mr-4" src="https://i.pravatar.cc/60" alt="">
+                            <div>
+                                <div>{{ player.name }} #{{ player.shirtNumber }}</div>
+                                <div class="text-sm text-gray-500">{{ player.position }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <div *ngFor="let player of getMatch().awayTeam.lineup" class="flex justify-end items-center p-4">
+                            <div>
+                                <div>{{ player.name }} #{{ player.shirtNumber }}</div>
+                                <div class="text-sm text-gray-500 text-right">{{ player.position }}</div>
+                            </div>
+                            <img class="rounded-full border-2 ml-4" src="https://i.pravatar.cc/60" alt="">
+                        </div>
+                    </div>
+                </div>
+                <h5 class="text-center text-lg my-4">Bench</h5>
+                <div class="flex justify-between">
+                    <div class="w-1/2">
+                        <div *ngFor="let player of getMatch().homeTeam.bench" class="flex items-center p-4">
+                            <img class="rounded-full border-2 mr-4" src="https://i.pravatar.cc/60" alt="">
+                            <div>
+                                <div>{{ player.name }} #{{ player.shirtNumber }}</div>
+                                <div class="text-sm text-gray-500">{{ player.position }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <div *ngFor="let player of getMatch().awayTeam.bench" class="flex justify-end items-center p-4">
+                            <div>
+                                <div>{{ player.name }} #{{ player.shirtNumber }}</div>
+                                <div class="text-sm text-gray-500 text-right">{{ player.position }}</div>
+                            </div>
+                            <img class="rounded-full border-2 ml-4" src="https://i.pravatar.cc/60" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
